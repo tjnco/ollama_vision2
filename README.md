@@ -39,7 +39,6 @@ data:
   image_url: 
     - www/camera_snapshots/Front_default.jpg
     - https://myipcamera.local/live.jpg
-  device_id: b9d50fa9859ada72422dd2691febcd88
   image_name: Front_Status
   device_id: <YOUR OLLAMA VISION DEVICE ID>    
 ```
