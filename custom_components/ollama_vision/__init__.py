@@ -240,17 +240,21 @@ async def handle_analyze_image(hass, call):
     # If the image is within /config/www, it will actually 
     # be displayed in companion app notifications
     # Normalize image_url to a list
+    _LOGGER.debug("image_url: %s", image_url)
     if isinstance(image_url, str):
         s = image_url.strip()
 
         # If it's JSON list (recommended)
         if s.startswith("[") and s.endswith("]"):
+            _LOGGER.debug("image_url is JSON")
             try:
                 parsed = json.loads(s)
                 if isinstance(parsed, list):
+                    _LOGGER.debug("json is list")
                     image_urls = parsed
                 else:
                     image_urls = [image_url]
+                _LOGGER.debug("image_urls: %s", image_urls)
             except Exception:
                 image_urls = [image_url]
         else:
