@@ -51,7 +51,7 @@ CONFIG_SCHEMA = config_entry_only_config_schema(DOMAIN)
 # Service schema
 ANALYZE_IMAGE_SCHEMA = vol.Schema(
     {
-        vol.Required(ATTR_IMAGE_URL):  vol.Any(cv.string, [cv.string]),
+        vol.Required(ATTR_IMAGE_URL): vol.Any(cv.string,vol.All(cv.ensure_list, [cv.string])),
         vol.Optional(ATTR_PROMPT, default=DEFAULT_PROMPT): cv.string,
         vol.Required(ATTR_IMAGE_NAME): cv.string,
         vol.Optional(ATTR_DEVICE_ID): cv.string,
@@ -241,7 +241,20 @@ async def handle_analyze_image(hass, call):
     # be displayed in companion app notifications
     # Normalize image_url to a list
     if isinstance(image_url, str):
-        image_urls = [image_url]
+        s = image_url.strip()
+
+        # If it's JSON list (recommended)
+        if s.startswith("[") and s.endswith("]"):
+            try:
+                parsed = json.loads(s)
+                if isinstance(parsed, list):
+                    image_urls = parsed
+                else:
+                    image_urls = [image_url]
+            except Exception:
+                image_urls = [image_url]
+        else:
+            image_urls = [image_url]
     else:
         image_urls = list(image_url)
 
