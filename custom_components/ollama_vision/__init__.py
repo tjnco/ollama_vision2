@@ -182,6 +182,46 @@ async def handle_analyze_image(hass, call):
     # Properly slugify the image name to ensure consistent IDs
     slugified_image_name = slugify(image_name)
     
+    # Replace 'www/' with 'local/' if applicable
+    # If the image is within /config/www, it will actually 
+    # be displayed in companion app notifications
+    # Normalize image_url to a list
+    _LOGGER.debug("image_url: %s", image_url)
+    if isinstance(image_url, str):
+        s = image_url.strip()
+
+        # If it's JSON list (recommended)
+        if s.startswith("[") and s.endswith("]"):
+            _LOGGER.debug("image_url is JSON")
+            try:
+                parsed = json.loads(s)
+                if isinstance(parsed, list):
+                    _LOGGER.debug("json is list")
+                    image_urls = parsed
+                else:
+                    image_urls = [image_url]
+                _LOGGER.debug("image_urls: %s", image_urls)
+            except Exception:
+                image_urls = [image_url]
+        else:
+            image_urls = [image_url]
+    else:
+        image_urls = list(image_url)
+
+    #validate for strings
+    for url in image_urls:
+        if not isinstance(url, str):
+            raise ValueError("image_url entries must be strings")
+
+    # Normalize each path
+    normalized_urls = []
+    for url in image_urls:
+        if url.startswith("www/"):
+            url = url.replace("www/", "local/", 1)
+        normalized_urls.append(url)
+
+    image_url = normalized_urls
+
     # Determine which integration to use based on device_id
     entry_id_to_use = None
     
@@ -234,47 +274,6 @@ async def handle_analyze_image(hass, call):
     if use_text_model and text_model_enabled:
         text_prompt_formatted = text_prompt.format(description=vision_description)
         final_description = await client_to_use.elaborate_text(vision_description, text_prompt_formatted)
-    
-    
-    # Replace 'www/' with 'local/' if applicable
-    # If the image is within /config/www, it will actually 
-    # be displayed in companion app notifications
-    # Normalize image_url to a list
-    _LOGGER.debug("image_url: %s", image_url)
-    if isinstance(image_url, str):
-        s = image_url.strip()
-
-        # If it's JSON list (recommended)
-        if s.startswith("[") and s.endswith("]"):
-            _LOGGER.debug("image_url is JSON")
-            try:
-                parsed = json.loads(s)
-                if isinstance(parsed, list):
-                    _LOGGER.debug("json is list")
-                    image_urls = parsed
-                else:
-                    image_urls = [image_url]
-                _LOGGER.debug("image_urls: %s", image_urls)
-            except Exception:
-                image_urls = [image_url]
-        else:
-            image_urls = [image_url]
-    else:
-        image_urls = list(image_url)
-
-    #validate for strings
-    for url in image_urls:
-        if not isinstance(url, str):
-            raise ValueError("image_url entries must be strings")
-
-    # Normalize each path
-    normalized_urls = []
-    for url in image_urls:
-        if url.startswith("www/"):
-            url = url.replace("www/", "local/", 1)
-        normalized_urls.append(url)
-
-    image_url = normalized_urls
     
     # Store data so the sensor can display it
     pending_sensors = hass.data[DOMAIN].setdefault("pending_sensors", {}).setdefault(entry_id_to_use, {})
