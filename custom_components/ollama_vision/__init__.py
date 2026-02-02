@@ -208,6 +208,9 @@ async def handle_analyze_image(hass, call):
     else:
         image_urls = list(image_url)
 
+    _LOGGER.debug("image_urls: %s", image_urls)
+    _LOGGER.debug("image_urls(type): %s", type(image_urls))
+
     #validate for strings
     for url in image_urls:
         if not isinstance(url, str):
