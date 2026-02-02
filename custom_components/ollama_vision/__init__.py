@@ -1,5 +1,6 @@
 """The Ollama Vision 2 integration."""
 import logging
+import json
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
