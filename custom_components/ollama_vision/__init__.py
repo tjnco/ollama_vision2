@@ -191,7 +191,6 @@ async def handle_analyze_image(hass, call):
 
     if isinstance(image_url, str):
         s = image_url.strip()
-        _LOGGER.debug("image_url(type): %s", type(image_url))
         # If it's JSON list (recommended)
         if s.startswith("[") and s.endswith("]"):
             _LOGGER.debug("image_url is JSON")
@@ -206,6 +205,7 @@ async def handle_analyze_image(hass, call):
                     image_urls = list(image_url)
                 _LOGGER.debug("image_urls: %s", image_urls)
             except Exception:
+                _LOGGER.debug("Exception??")
                 image_urls = [image_url]
         else:
             image_urls = [image_url]
