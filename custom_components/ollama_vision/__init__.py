@@ -205,6 +205,8 @@ async def handle_analyze_image(hass, call):
                 image_urls = [image_url]
         else:
             image_urls = [image_url]
+    else if isinstance(image_url, list):
+        image_urls = image_url
     else:
         image_urls = list(image_url)
 
