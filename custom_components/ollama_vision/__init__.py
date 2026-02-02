@@ -187,6 +187,8 @@ async def handle_analyze_image(hass, call):
     # be displayed in companion app notifications
     # Normalize image_url to a list
     _LOGGER.debug("image_url: %s", image_url)
+    _LOGGER.debug("image_url(type): %s", type(image_url))
+
     if isinstance(image_url, str):
         s = image_url.strip()
 
@@ -206,8 +208,12 @@ async def handle_analyze_image(hass, call):
         else:
             image_urls = [image_url]
     elif isinstance(image_url, list):
+        _LOGGER.debug("image_url is list")
+        _LOGGER.debug("image_urls[0]: %s", image_urls[0])
+        _LOGGER.debug("image_urls[1]: %s", image_urls[0])
         image_urls = image_url
     else:
+        _LOGGER.debug("image_url convert to list")
         image_urls = list(image_url)
 
     _LOGGER.debug("image_urls: %s", image_urls)
